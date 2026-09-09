@@ -1,0 +1,131 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  role         String   @default("EDITOR") // SUPERADMIN, EDITOR, ESTIMATOR, AUDITOR
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  auditLogs    AdminAuditLog[]
+}
+
+model ClientEntity {
+  id            String   @id
+  slug          String   @unique
+  nameAr        String
+  nameEn        String
+  category      String   // MINISTRY, AMANAT, PIF_GIGA, SEMI_GOV, AUTHORITY, PRIVATE
+  monogram      String
+  descriptionAr String
+  descriptionEn String
+  isFeatured    Boolean  @default(true)
+  projects      ProjectCaseStudy[]
+  createdAt     DateTime @default(now())
+}
+
+model CapabilityVertical {
+  id               String   @id
+  code             String   @unique
+  titleAr          String
+  titleEn          String
+  shortDescAr      String
+  shortDescEn      String
+  fullDescAr       String
+  fullDescEn       String
+  iconName         String
+  subServicesAr    String   // JSON string of string[] — Arabic sub-service list
+  subServicesEn    String   // JSON string of string[] — English sub-service list
+  equipmentDeployed String  // JSON string of string[] — equipment labels (Arabic)
+  standards        String   // JSON string of string[] — certification codes
+  projects         ProjectCaseStudy[]
+  createdAt        DateTime @default(now())
+}
+
+
+model ProjectCaseStudy {
+  id               String   @id @default(uuid())
+  slug             String   @unique
+  titleAr          String
+  titleEn          String
+  clientId         String
+  client           ClientEntity @relation(fields: [clientId], references: [id])
+  verticalId       String
+  vertical         CapabilityVertical @relation(fields: [verticalId], references: [id])
+  region           String   // CENTRAL, WESTERN, EASTERN, SOUTHERN, NORTHERN
+  cityAr           String
+  cityEn           String
+  lat              Float
+  lng              Float
+  executionStatus  String   @default("COMPLETED") // ACTIVE_EXECUTION, COMPLETED
+  yearHijri        Int
+  yearGregorian    Int
+  summaryAr        String
+  summaryEn        String
+  challengeAr      String
+  challengeEn      String
+  solutionAr       String
+  solutionEn       String
+  metrics          String   // JSON string of ProjectMetric[]
+  fleetUnits       String   // JSON string of string[]
+  heroImageUrl     String
+  galleryUrls      String   // JSON string of string[]
+  isFlagship       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model InquirySubmission {
+  id               String   @id @default(uuid())
+  trackingId       String   @unique
+  intentType       String   // GOVERNMENT_TENDER, ENTERPRISE_RFP, SUBCONTRACTOR_ONBOARD, TECHNICAL_RFI, CAREER_APPLICATION
+  fullName         String
+  organization     String
+  email            String
+  phone            String
+  scopedData       String   // JSON string containing intent-specific fields
+  workflowStatus   String   @default("NEW") // NEW, IN_REVIEW, RESPONDED, ARCHIVED
+  internalNotes    String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model VendorRegistration {
+  id               String   @id @default(uuid())
+  trackingId       String   @unique
+  companyNameAr    String
+  companyNameEn    String
+  crNumber         String   @unique
+  vatNumber        String
+  gosiNumber       String
+  nitaqatRating    String
+  headOfficeCity   String
+  signatoryName    String
+  authorizedMobile String
+  officialEmail    String
+  tradeSpecialties String   // JSON string of string[]
+  ibanNumber       String
+  reviewStatus     String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt        DateTime @default(now())
+}
+
+model AdminAuditLog {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  ipAddress    String
+  action       String   // PROJECT_MUTATION, STATUS_CHANGE, LOGIN, PREQUAL_GENERATE
+  resourceType String
+  resourceId   String?
+  details      String   // JSON string
+  timestamp    DateTime @default(now())
+}

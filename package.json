@@ -1,0 +1,27 @@
+{
+  "name": "alhadab-enterprise-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AL-HADAB Trading & Contracting Co. Enterprise Digital Platform",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@alhadab/client",
+    "dev:server": "npm run dev --workspace=@alhadab/server",
+    "dev:client": "npm run dev --workspace=@alhadab/client",
+    "build:shared": "npm run build --workspace=@alhadab/shared",
+    "build:server": "npm run build --workspace=@alhadab/server",
+    "build:client": "npm run build --workspace=@alhadab/client",
+    "build": "npm run build:shared && npm run build:server && npm run build:client"
+  },
+  "keywords": [
+    "al-hadab",
+    "construction",
+    "engineering",
+    "saudi-arabia",
+    "vision-2030"
+  ],
+  "author": "AL-HADAB Trading & Contracting Co.",
+  "license": "UNLICENSED"
+}
