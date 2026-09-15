@@ -17,15 +17,33 @@ app.use(
 );
 
 // 2. CORS Policy
-const allowedOrigins = ENV.CORS_ORIGIN.split(",").map((o) => o.trim());
+const configuredOrigins = ENV.CORS_ORIGIN.split(",")
+  .map((o) => o.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
+
+const allowedOrigins = new Set([
+  ...configuredOrigins,
+  "https://al-hadab-enterprise-platform-client.vercel.app"
+]);
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl) or matched origins
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests with no origin (e.g. server-to-server, curl, mobile apps)
+      if (!origin) {
+        return callback(null, true);
+      }
+      const normalizedOrigin = origin.replace(/\/+$/, "");
+      const isExplicitlyAllowed = allowedOrigins.has(normalizedOrigin);
+      const isVercelPreview =
+        normalizedOrigin.startsWith("https://al-hadab-") &&
+        normalizedOrigin.endsWith(".vercel.app");
+
+      if (isExplicitlyAllowed || isVercelPreview || allowedOrigins.has("*")) {
         callback(null, true);
       } else {
-        callback(new Error("Blocked by CORS security policy"));
+        console.warn(`[CORS] Blocked by security policy for origin: ${origin}`);
+        callback(new Error(`Blocked by CORS security policy: ${origin}`));
       }
     },
     credentials: true,

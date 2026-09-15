@@ -41,7 +41,6 @@ services:
         sync: false
 
       # ── CORS ─────────────────────────────────────────────────────────────────
-      # Comma-separated list of allowed origins (e.g. your Vercel deployment URL)
-      # Example: https://al-hadab.vercel.app,https://alhadab.com.sa
+      # Allowed frontend origins
       - key: CORS_ORIGIN
-        sync: false
+        value: https://al-hadab-enterprise-platform-client.vercel.app,http://localhost:5173
