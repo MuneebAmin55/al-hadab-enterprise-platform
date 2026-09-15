@@ -46,8 +46,10 @@ import type {
   UpdateAdminUserInput
 } from "@alhadab/shared";
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string)?.trim() || "/api/v1";
+
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: "/api/v1",
+  baseUrl: API_BASE_URL.replace(/\/+$/, ""),
   prepareHeaders: (headers, { getState }) => {
     const stateToken = (getState() as RootState).auth?.accessToken;
     const storageToken = typeof window !== "undefined" ? localStorage.getItem("alhadab_token") : null;

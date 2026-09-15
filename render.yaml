@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: alhadab-enterprise-api
+    runtime: node
+    region: frankfurt # Selected for optimal latency to Saudi Arabia / MENA
+    plan: starter
+
+    # Root of the monorepo
+    rootDir: .
+
+    # Build sequence:
+    # 1. Install dependencies across all workspaces
+    # 2. Compile @alhadab/shared (CJS & ESM)
+    # 3. Generate Prisma client from schema
+    # 4. Compile Express TypeScript server into packages/server/dist
+    buildCommand: npm install && npm run build:shared && npx prisma generate --schema=packages/server/prisma/schema.prisma && npm run build:server
+
+    # Start production Express server
+    startCommand: node packages/server/dist/server.js
+
+    # Health check endpoint for zero-downtime deploys
+    healthCheckPath: /health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # ── Neon PostgreSQL ──────────────────────────────────────────────────────
+      # Set in Render Dashboard -> Environment:
+      # Format: postgresql://USER:PASSWORD@ep-xxx.REGION.neon.tech/DBNAME?sslmode=require&connect_timeout=30
+      - key: DATABASE_URL
+        sync: false
+
+      # ── Authentication Secrets ────────────────────────────────────────────────
+      # Generate strong 64-character hex strings:
+      # node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+      - key: JWT_SECRET
+        sync: false
+
+      - key: JWT_REFRESH_SECRET
+        sync: false
+
+      # ── CORS ─────────────────────────────────────────────────────────────────
+      # Comma-separated list of allowed origins (e.g. your Vercel deployment URL)
+      # Example: https://al-hadab.vercel.app,https://alhadab.com.sa
+      - key: CORS_ORIGIN
+        sync: false
