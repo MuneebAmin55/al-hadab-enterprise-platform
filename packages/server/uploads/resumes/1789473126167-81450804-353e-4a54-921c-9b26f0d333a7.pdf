@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ar" dir="rtl" class="h-full scroll-smooth">
+  <head>
+    <script type="module">import { injectIntoGlobalHook } from "/@react-refresh";
+injectIntoGlobalHook(window);
+window.$RefreshReg$ = () => {};
+window.$RefreshSig$ = () => (type) => type;</script>
+
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>شركة الهضب للتجارة والمقاولات | خبرة وطنية منذ 1396هـ (1976م)</title>
+    <meta name="description" content="شركة سعودية رائدة في تنفيذ البنية التحتية، شبكات المياه والصرف الصحي، الطرق والجسور، الطاقة المتجددة، وتشجير المدن، وفق أعلى معايير الجودة والسلامة لرؤية 2030." />
+    
+    <!-- Preconnect to Google Fonts for high-performance typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- OpenGraph & Twitter Card Metadata -->
+    <meta property="og:site_name" content="AL-HADAB Trading & Contracting Co." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ar_SA" />
+    <meta property="og:locale:alternate" content="en_SA" />
+  </head>
+  <body class="min-h-full bg-sand-50 text-basalt-950 antialiased selection:bg-copper-500 selection:text-white font-sans">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

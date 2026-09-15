@@ -32,6 +32,7 @@ export const MainLayout: React.FC = () => {
     { to: "/about", labelAr: "من نحن", labelEn: "About Us" },
     { to: "/capabilities", labelAr: "قدراتنا الهندسية", labelEn: "Capabilities" },
     { to: "/projects", labelAr: "مشاريعنا", labelEn: "Projects Vault" },
+    { to: "/news", labelAr: "المركز الإعلامي", labelEn: "Media Center" },
     { to: "/suppliers", labelAr: "الموردون والمقاولون", labelEn: "Subcontractors" },
     { to: "/careers", labelAr: "التوظيف والكفاءات", labelEn: "Careers" },
     { to: "/contact", labelAr: "تواصل معنا والمناقصات", labelEn: "Contact & RFPs" }
@@ -262,6 +263,11 @@ export const MainLayout: React.FC = () => {
                   <button onClick={handleOpenPrequal} className="hover:text-copper-400 transition-colors text-start">
                     {isAr ? "التأهيل المسبق الفوري" : "Fast-Track Prequalification"}
                   </button>
+                </li>
+                <li>
+                  <Link to="/news" className="hover:text-copper-400 transition-colors">
+                    {isAr ? "المركز الإعلامي والأخبار" : "Media Center & News"}
+                  </Link>
                 </li>
                 <li>
                   <Link to="/contact" className="hover:text-copper-400 transition-colors">

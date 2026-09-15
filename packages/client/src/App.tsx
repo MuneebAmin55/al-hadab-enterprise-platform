@@ -17,7 +17,10 @@ const ProjectsPage = lazy(() => import("./pages/ProjectsPage").then((m) => ({ de
 const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage").then((m) => ({ default: m.ProjectDetailPage })));
 const SuppliersPage = lazy(() => import("./pages/SuppliersPage").then((m) => ({ default: m.SuppliersPage })));
 const CareersPage = lazy(() => import("./pages/CareersPage").then((m) => ({ default: m.CareersPage })));
+const JobDetailPage = lazy(() => import("./pages/JobDetailPage").then((m) => ({ default: m.JobDetailPage })));
 const ContactPage = lazy(() => import("./pages/ContactPage").then((m) => ({ default: m.ContactPage })));
+const NewsPage = lazy(() => import("./pages/NewsPage").then((m) => ({ default: m.NewsPage })));
+const NewsDetailPage = lazy(() => import("./pages/NewsDetailPage").then((m) => ({ default: m.NewsDetailPage })));
 const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage").then((m) => ({ default: m.AdminDashboardPage })));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
 
@@ -52,8 +55,11 @@ const router = createBrowserRouter([
       { path: "capabilities", element: <Suspense fallback={<PageFallback />}><CapabilitiesPage /></Suspense> },
       { path: "projects", element: <Suspense fallback={<PageFallback />}><ProjectsPage /></Suspense> },
       { path: "projects/:slug", element: <Suspense fallback={<PageFallback />}><ProjectDetailPage /></Suspense> },
+      { path: "news", element: <Suspense fallback={<PageFallback />}><NewsPage /></Suspense> },
+      { path: "news/:slug", element: <Suspense fallback={<PageFallback />}><NewsDetailPage /></Suspense> },
       { path: "suppliers", element: <Suspense fallback={<PageFallback />}><SuppliersPage /></Suspense> },
       { path: "careers", element: <Suspense fallback={<PageFallback />}><CareersPage /></Suspense> },
+      { path: "careers/:id", element: <Suspense fallback={<PageFallback />}><JobDetailPage /></Suspense> },
       { path: "contact", element: <Suspense fallback={<PageFallback />}><ContactPage /></Suspense> },
       { path: "admin", element: <Suspense fallback={<PageFallback />}><AdminDashboardPage /></Suspense> },
       { path: "*", element: <Suspense fallback={<PageFallback />}><NotFoundPage /></Suspense> }

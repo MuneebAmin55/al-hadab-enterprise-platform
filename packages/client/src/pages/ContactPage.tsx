@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ScopedInquirySchema, ScopedInquiryInput } from "@alhadab/shared";
-import { useSubmitInquiryMutation } from "../services/apiSlice";
+import { useSubmitInquiryMutation, useGetCompanyProfileQuery } from "../services/apiSlice";
 import { useAppSelector } from "../app/hooks";
-import { Badge } from "../components/ui/Badge";
-import { Button } from "../components/ui/Button";
+import { Badge, Button, SEOHead, ScrollReveal, PageLoader } from "../components/ui";
 import {
   Building2,
   Phone,
@@ -23,6 +22,8 @@ export const ContactPage: React.FC = () => {
   const isAr = language === "ar";
   const [submitInquiry, { isLoading }] = useSubmitInquiryMutation();
   const [submittedReceipt, setSubmittedReceipt] = useState<any | null>(null);
+
+  const { data: profile, isLoading: profileLoading } = useGetCompanyProfileQuery();
 
   const {
     register,
@@ -51,6 +52,14 @@ export const ContactPage: React.FC = () => {
 
   return (
     <div className="space-y-12 py-12">
+      <SEOHead
+        titleAr="تواصل معنا والمناقصات — تقديم طلبات العروض الفنية"
+        titleEn="Contact & Tendering — Submit Scoped RFPs & Inquiries"
+        descriptionAr="تواصل مع الإدارة العليا ولجنة التقدير الهندسي لشركة الهضب: تقديم طلبات المناقصات، الاستفسارات الفنية، وبيانات المقر الرئيسي بالرياض."
+        descriptionEn="Direct communication portal with AL-HADAB executive leadership and chief estimators for tender submissions, RFPs, and office locations in Riyadh."
+        canonicalPath="/contact"
+      />
+
       {/* Header Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-sand-200 pb-8 space-y-3 text-start">
@@ -324,48 +333,77 @@ export const ContactPage: React.FC = () => {
 
           {/* Riyadh Headquarters Directory Column */}
           <div className="lg:col-span-4 space-y-6 text-start">
-            <div className="bg-basalt-950 text-white border border-basalt-800 rounded-[8px] p-6 space-y-5 shadow-elevation-2">
-              <div>
-                <Badge variant="copper">{isAr ? "المقر الرئيسي" : "Headquarters"}</Badge>
-                <h3 className="text-lg font-bold text-white mt-2">
-                  {isAr ? "شركة الهضب للتجارة والمقاولات" : "AL-HADAB Headquarters"}
-                </h3>
-                <p className="text-xs text-sand-300 font-mono mt-0.5">
-                  {isAr ? "مبنى الشركة الرئيسي - الرياض" : "Corporate Office - Riyadh"}
-                </p>
-              </div>
-
-              <div className="space-y-3 text-xs text-sand-300">
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 text-copper-400 shrink-0 mt-0.5" />
-                  <span className="leading-relaxed">
+            {profileLoading ? (
+              <PageLoader variant="shimmer-single" />
+            ) : (
+              <div className="bg-basalt-950 text-white border border-basalt-800 rounded-[8px] p-6 space-y-5 shadow-elevation-2">
+                <div>
+                  <Badge variant="copper">{isAr ? "المقر الرئيسي" : "Headquarters"}</Badge>
+                  <h3 className="text-lg font-bold text-white mt-2">
                     {isAr
-                      ? "شارع الديار، حي غرناطة، ص.ب 13242، الرياض، المملكة العربية السعودية"
-                      : "Al-Diyar Street, Granada District, P.O. Box 13242, Riyadh, Saudi Arabia"}
-                  </span>
+                      ? (profile?.nameAr || "شركة الهضب للتجارة والمقاولات")
+                      : (profile?.nameEn || "AL-HADAB Headquarters")}
+                  </h3>
+                  <p className="text-xs text-sand-300 font-mono mt-0.5">
+                    {isAr ? "مبنى الشركة الرئيسي - الرياض" : "Corporate Office - Riyadh"}
+                  </p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-copper-400 shrink-0" />
-                  <a href="tel:+966112498383" className="font-mono hover:text-white">
-                    +966 11 249 8383 / 8686
-                  </a>
+                <div className="space-y-3 text-xs text-sand-300">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-4 w-4 text-copper-400 shrink-0 mt-0.5" />
+                    <span className="leading-relaxed">
+                      {isAr
+                        ? (profile?.addressAr || "شارع الديار، حي غرناطة، ص.ب 13242، الرياض، المملكة العربية السعودية")
+                        : (profile?.addressEn || "Al-Diyar Street, Granada District, P.O. Box 13242, Riyadh, Saudi Arabia")}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Phone className="h-4 w-4 text-copper-400 shrink-0" />
+                    <a
+                      href={`tel:${profile?.phonePrimary || "+966112498383"}`}
+                      className="font-mono hover:text-white"
+                    >
+                      {profile?.phonePrimary || "+966 11 249 8383"}
+                      {profile?.phoneSecondary ? ` / ${profile.phoneSecondary}` : " / 8686"}
+                    </a>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Mail className="h-4 w-4 text-copper-400 shrink-0" />
+                    <a
+                      href={`mailto:${profile?.emailTenders || "tenders@alhadab.com.sa"}`}
+                      className="font-mono hover:text-white break-all"
+                    >
+                      {profile?.emailTenders || "tenders@alhadab.com.sa"}
+                    </a>
+                  </div>
+
+                  {profile?.whatsapp && (
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-4 w-4 text-copper-400 shrink-0" />
+                      <a
+                        href={`https://wa.me/${profile.whatsapp.replace(/[^0-9]/g, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono hover:text-white"
+                      >
+                        {isAr ? "واتساب: " : "WhatsApp: "}{profile.whatsapp}
+                      </a>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-copper-400 shrink-0" />
-                  <span className="font-mono">tenders@alhadab.com.sa</span>
+                <div className="border-t border-basalt-800 pt-4">
+                  <p className="text-[11px] text-sand-400 leading-relaxed">
+                    {isAr
+                      ? "ساعات العمل الرسمية: الأحد إلى الخميس، من 8:00 صباحاً حتى 5:00 مساءً بتوقيت مكة المكرمة."
+                      : "Office Hours: Sunday to Thursday, 8:00 AM to 5:00 PM (AST)."}
+                  </p>
                 </div>
               </div>
-
-              <div className="border-t border-basalt-800 pt-4">
-                <p className="text-[11px] text-sand-400 leading-relaxed">
-                  {isAr
-                    ? "ساعات العمل الرسمية: الأحد إلى الخميس، من 8:00 صباحاً حتى 5:00 مساءً بتوقيت مكة المكرمة."
-                    : "Office Hours: Sunday to Thursday, 8:00 AM to 5:00 PM (AST)."}
-                </p>
-              </div>
-            </div>
+            )}
 
             {/* Quick Fast-Track Alternative */}
             <div className="bg-sand-100/70 border border-sand-200 rounded-[8px] p-6 space-y-2">

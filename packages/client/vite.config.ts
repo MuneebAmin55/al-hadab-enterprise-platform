@@ -19,6 +19,18 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
+          redux: ["@reduxjs/toolkit", "react-redux"],
+          motion: ["framer-motion"],
+          icons: ["lucide-react"]
+        }
+      }
+    }
   }
 });
 

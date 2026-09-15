@@ -123,4 +123,26 @@ export class VendorsController {
       next(error);
     }
   }
+
+  static async updateStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      const updated = await prisma.vendorRegistration.update({
+        where: { id },
+        data: {
+          reviewStatus: status
+        }
+      });
+
+      return res.status(200).json({
+        success: true,
+        statusCode: 200,
+        data: updated
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -8,6 +8,7 @@ export interface CapabilityVertical {
   fullDescAr: string;
   fullDescEn: string;
   iconName: string;
+  imageUrl?: string;
   subServicesAr: string[];
   subServicesEn: string[];
   subServices?: {
@@ -16,6 +17,11 @@ export interface CapabilityVertical {
   };
   equipmentDeployed: string[];
   standards: string[];
+  displayOrder?: number;
+  isFeatured?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   recentProjects?: {
     id: string;
     slug: string;
@@ -34,6 +40,7 @@ export interface CapabilityVertical {
     executionStatus?: string;
   }[];
 }
+
 
 export const CAPABILITY_VERTICALS: CapabilityVertical[] = [
   {

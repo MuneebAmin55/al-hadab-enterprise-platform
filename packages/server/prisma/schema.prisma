@@ -15,7 +15,7 @@ model User {
   role         String   @default("EDITOR") // SUPERADMIN, EDITOR, ESTIMATOR, AUDITOR
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  updatedAt    DateTime @default(now()) @updatedAt
   auditLogs    AdminAuditLog[]
 }
 
@@ -25,12 +25,17 @@ model ClientEntity {
   nameAr        String
   nameEn        String
   category      String   // MINISTRY, AMANAT, PIF_GIGA, SEMI_GOV, AUTHORITY, PRIVATE
-  monogram      String
-  descriptionAr String
-  descriptionEn String
+  monogram      String   @default("")
+  logoUrl       String   @default("")
+  websiteUrl    String   @default("")
+  descriptionAr String   @default("")
+  descriptionEn String   @default("")
+  displayOrder  Int      @default(0)
   isFeatured    Boolean  @default(true)
+  isActive      Boolean  @default(true)
   projects      ProjectCaseStudy[]
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
 }
 
 model CapabilityVertical {
@@ -40,17 +45,21 @@ model CapabilityVertical {
   titleEn          String
   shortDescAr      String
   shortDescEn      String
-  fullDescAr       String
-  fullDescEn       String
+  fullDescAr       String   @db.Text
+  fullDescEn       String   @db.Text
   iconName         String
+  imageUrl         String   @default("")
   subServicesAr    String   // JSON string of string[] — Arabic sub-service list
   subServicesEn    String   // JSON string of string[] — English sub-service list
-  equipmentDeployed String  // JSON string of string[] — equipment labels (Arabic)
+  equipmentDeployed String  @db.Text // JSON string of string[] — equipment labels (Arabic)
   standards        String   // JSON string of string[] — certification codes
+  displayOrder     Int      @default(0)
+  isFeatured       Boolean  @default(false)
+  isActive         Boolean  @default(true)
   projects         ProjectCaseStudy[]
   createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now()) @updatedAt
 }
-
 
 model ProjectCaseStudy {
   id               String   @id @default(uuid())
@@ -80,8 +89,10 @@ model ProjectCaseStudy {
   heroImageUrl     String
   galleryUrls      String   // JSON string of string[]
   isFlagship       Boolean  @default(false)
+  displayOrder     Int      @default(0)
+  isPublished      Boolean  @default(true)
   createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  updatedAt        DateTime @default(now()) @updatedAt
 }
 
 model InquirySubmission {
@@ -93,10 +104,11 @@ model InquirySubmission {
   email            String
   phone            String
   scopedData       String   // JSON string containing intent-specific fields
-  workflowStatus   String   @default("NEW") // NEW, IN_REVIEW, RESPONDED, ARCHIVED
+  workflowStatus   String   @default("NEW") // NEW, IN_PROGRESS, IN_REVIEW, CONTACTED, RESPONDED, COMPLETED, ARCHIVED
   internalNotes    String?
+  isRead           Boolean  @default(false)
   createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  updatedAt        DateTime @default(now()) @updatedAt
 }
 
 model VendorRegistration {
@@ -128,4 +140,137 @@ model AdminAuditLog {
   resourceId   String?
   details      String   // JSON string
   timestamp    DateTime @default(now())
+}
+
+model CompanyProfile {
+  id                       String   @id @default("singleton")
+
+  // Identity
+  nameAr                   String
+  nameEn                   String
+  legalEntityAr            String
+  legalEntityEn            String
+  foundingYearHijri        Int
+  foundingYearGregorian    Int
+
+  // Location & Contact
+  headquartersAr           String
+  headquartersEn           String
+  addressAr                String
+  addressEn                String
+  phonePrimary             String
+  phoneSecondary           String   @default("")
+  whatsapp                 String   @default("")
+  emailOfficial            String
+  emailTenders             String
+
+  // Legal
+  contractorClassification String   @default("")
+  crNumber                 String   @default("")
+  vatNumber                String   @default("")
+
+  // Stats
+  statsYearsOfExperience    Int      @default(0)
+  statsActiveWorkforce      Int      @default(0)
+  statsHeavyEquipmentUnits  Int      @default(0)
+  statsSafeManHoursLogged   Int      @default(0)
+  statsNationalPartnersCount Int     @default(0)
+  statsCompletedProjectsCount Int    @default(0)
+
+  // Bilingual Content
+  shortDescAr              String   @default("")
+  shortDescEn              String   @default("")
+  fullDescAr               String   @default("") @db.Text
+  fullDescEn               String   @default("") @db.Text
+  founderMessageAr         String   @default("") @db.Text
+  founderMessageEn         String   @default("") @db.Text
+  visionAr                 String   @default("")
+  visionEn                 String   @default("")
+  missionAr                String   @default("")
+  missionEn                String   @default("")
+
+  // Media
+  mainImageUrl             String   @default("")
+
+  // SEO
+  seoTitleAr               String   @default("")
+  seoTitleEn               String   @default("")
+  seoDescAr                String   @default("")
+  seoDescEn                String   @default("")
+
+  // Publishing
+  isPublished              Boolean  @default(true)
+
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @default(now()) @updatedAt
+}
+
+model WorkforceCategory {
+  id            String   @id @default(uuid())
+  nameEn        String
+  nameAr        String
+  employeeCount Int      @default(0)
+  descriptionEn String?  @db.Text
+  descriptionAr String?  @db.Text
+  displayOrder  Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+}
+
+model NewsArticle {
+  id               String   @id @default(uuid())
+  slug             String   @unique
+  titleAr          String
+  titleEn          String
+  summaryAr        String   @db.Text
+  summaryEn        String   @db.Text
+  contentAr        String   @db.Text
+  contentEn        String   @db.Text
+  featuredImageUrl String   @default("")
+  author           String   @default("AL-HADAB Media Center")
+  publishedAt      DateTime @default(now())
+  category         String   @default("CORPORATE")
+  isFeatured       Boolean  @default(false)
+  isPublished      Boolean  @default(true)
+  seoTitleAr       String   @default("")
+  seoTitleEn       String   @default("")
+  seoDescAr        String   @default("")
+  seoDescEn        String   @default("")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now()) @updatedAt
+}
+
+model JobOpening {
+  id                  String           @id @default(uuid())
+  titleAr             String
+  titleEn             String
+  department          String
+  location            String
+  employmentType      String           @default("FULL_TIME") // FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP
+  descriptionAr       String           @db.Text
+  descriptionEn       String           @db.Text
+  requirementsAr      String           @db.Text
+  requirementsEn      String           @db.Text
+  applicationDeadline DateTime?
+  isPublished         Boolean          @default(true)
+  applications        JobApplication[]
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @default(now()) @updatedAt
+}
+
+model JobApplication {
+  id             String      @id @default(uuid())
+  jobOpeningId   String
+  jobOpening     JobOpening  @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
+  applicantName  String
+  email          String
+  phone          String
+  resumeUrl      String      @db.Text
+  resumeFileName String?
+  coverLetter    String?     @db.Text
+  status         String      @default("NEW") // NEW, REVIEWING, SHORTLISTED, INTERVIEW, REJECTED, HIRED
+  adminNotes     String?     @db.Text
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @default(now()) @updatedAt
 }

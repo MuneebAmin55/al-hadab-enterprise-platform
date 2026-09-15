@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import type { ClientEntity } from "@alhadab/shared";
 import { Building2 } from "lucide-react";
@@ -14,13 +14,24 @@ export const ClientLogo: React.FC<ClientLogoProps> = ({
   isAr,
   className = ""
 }) => {
+  const [imageError, setImageError] = useState(false);
+  const hasValidLogo = !!client.logoUrl && !imageError;
+
   return (
     <Link
       to={`/projects?clientCategory=${client.category}`}
       className={`group flex flex-col items-center justify-center p-5 rounded-[8px] bg-white border border-sand-200 transition-all duration-200 hover:border-copper-500/40 hover:shadow-elevation-2 hover:bg-sand-50/50 text-center ${className}`}
     >
-      <div className="h-12 w-12 rounded-full bg-sand-100 border border-sand-200 group-hover:bg-copper-50 group-hover:border-copper-200 flex items-center justify-center text-basalt-700 group-hover:text-copper-600 transition-colors mb-3">
-        {client.monogram ? (
+      <div className="h-12 w-12 rounded-full bg-sand-100 border border-sand-200 group-hover:bg-copper-50 group-hover:border-copper-200 flex items-center justify-center text-basalt-700 group-hover:text-copper-600 transition-colors mb-3 overflow-hidden p-1">
+        {hasValidLogo ? (
+          <img
+            src={client.logoUrl}
+            alt={isAr ? client.nameAr : client.nameEn}
+            className="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all"
+            onError={() => setImageError(true)}
+            loading="lazy"
+          />
+        ) : client.monogram ? (
           <span className="font-mono font-bold text-xs tracking-wider">
             {client.monogram.slice(0, 4)}
           </span>

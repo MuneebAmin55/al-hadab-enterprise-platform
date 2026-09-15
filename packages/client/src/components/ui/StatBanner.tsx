@@ -1,15 +1,17 @@
 import React from "react";
 import { ShieldCheck, HardHat, Truck, Award, CheckCircle2 } from "lucide-react";
+import type { CorporateProfile } from "@alhadab/shared";
 
 export interface StatBannerProps {
   isAr: boolean;
   className?: string;
+  statsData?: CorporateProfile["stats"];
 }
 
-export const StatBanner: React.FC<StatBannerProps> = ({ isAr, className = "" }) => {
+export const StatBanner: React.FC<StatBannerProps> = ({ isAr, className = "", statsData }) => {
   const stats = [
     {
-      value: "48+",
+      value: statsData?.yearsOfExperience ? `${statsData.yearsOfExperience}+` : "48+",
       labelAr: "عاماً من التميز الهندسي المتواصل",
       labelEn: "Years of Engineering Excellence",
       subAr: "منذ عام 1396هـ (1976م)",
@@ -17,7 +19,7 @@ export const StatBanner: React.FC<StatBannerProps> = ({ isAr, className = "" }) 
       icon: Award
     },
     {
-      value: "1,250+",
+      value: statsData?.activeWorkforce ? `${statsData.activeWorkforce.toLocaleString()}+` : "1,250+",
       labelAr: "كادر هندسي وفني ميداني",
       labelEn: "Skilled Technical Workforce",
       subAr: "كفاءات وطنية وعالمية متخصصة",
@@ -25,7 +27,7 @@ export const StatBanner: React.FC<StatBannerProps> = ({ isAr, className = "" }) 
       icon: HardHat
     },
     {
-      value: "280+",
+      value: statsData?.heavyEquipmentUnits ? `${statsData.heavyEquipmentUnits}+` : "280+",
       labelAr: "معدة ثقيلة وشاحنة مملوكة",
       labelEn: "Owned Heavy Equipment Fleet",
       subAr: "جاهزية فورية لأكبر المشاريع",
@@ -33,7 +35,7 @@ export const StatBanner: React.FC<StatBannerProps> = ({ isAr, className = "" }) 
       icon: Truck
     },
     {
-      value: "14.5M+",
+      value: statsData?.safeManHoursLogged ? `${(statsData.safeManHoursLogged / 1000000).toFixed(1)}M+` : "14.5M+",
       labelAr: "ساعة عمل آمنة دون حوادث",
       labelEn: "Safe Work Hours Logged",
       subAr: "أعلى معايير السلامة المهنية HSE",
@@ -41,7 +43,7 @@ export const StatBanner: React.FC<StatBannerProps> = ({ isAr, className = "" }) 
       icon: ShieldCheck
     },
     {
-      value: "165+",
+      value: statsData?.completedProjectsCount ? `${statsData.completedProjectsCount}+` : "165+",
       labelAr: "مشروع وطني وبنية تحتية منجز",
       labelEn: "Completed National Projects",
       subAr: "في شتى مناطق المملكة",

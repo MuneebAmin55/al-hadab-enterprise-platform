@@ -2,13 +2,18 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import {
+  useGetCompanyProfileQuery,
+  useGetPublicWorkforceQuery
+} from "../services/apiSlice";
+import {
   Badge,
   Button,
   MetricCard,
   ScrollReveal,
   SEOHead,
   SectionHeader,
-  StatBanner
+  StatBanner,
+  PageLoader
 } from "../components/ui";
 import {
   Building2,
@@ -33,6 +38,16 @@ export const AboutPage: React.FC = () => {
   const { language } = useAppSelector((state) => state.ui);
   const isAr = language === "ar";
   const Arrow = isAr ? ArrowLeft : ArrowRight;
+
+  const { data: profile } = useGetCompanyProfileQuery();
+  const { data: workforceSummary, isLoading: workforceLoading } = useGetPublicWorkforceQuery();
+
+  const dynamicStats = profile?.stats
+    ? {
+        ...profile.stats,
+        activeWorkforce: workforceSummary?.totalEmployees ?? profile.stats.activeWorkforce
+      }
+    : undefined;
 
   const [activeDecade, setActiveDecade] = useState<number>(0);
 
@@ -184,8 +199,8 @@ export const AboutPage: React.FC = () => {
             </h1>
             <p className="text-base sm:text-lg text-basalt-600 max-w-4xl leading-relaxed">
               {isAr
-                ? "تأسست شركة الهضب للتجارة والمقاولات عام 1396هـ (1976م) كصرح مقاولات وطني مصنف بالدرجة الأولى بالرياض. على مدار 48 عاماً، شاركت الشركة بفاعلية في بناء البنية التحتية للمملكة عبر مشاريع شبكات المياه والسيول، الطرق والجسور، والطاقة، مستندةً إلى أسطول مملوك يتجاوز 280 معدة ثقيلة وسجل سلامة قياسي."
-                : "Founded in 1396 AH (1976 G) in Riyadh, AL-HADAB is a premier Class 1 General Contractor. Over five uninterrupted decades, the company has delivered essential civil infrastructure for ministries, Amanats, and PIF giga-projects with an owned fleet exceeding 280 heavy machines."}
+                ? (profile?.shortDescAr || "تأسست شركة الهضب للتجارة والمقاولات عام 1396هـ (1976م) كصرح مقاولات وطني مصنف بالدرجة الأولى بالرياض. على مدار 48 عاماً، شاركت الشركة بفاعلية في بناء البنية التحتية للمملكة عبر مشاريع شبكات المياه والسيول، الطرق والجسور، والطاقة، مستندةً إلى أسطول مملوك يتجاوز 280 معدة ثقيلة وسجل سلامة قياسي.")
+                : (profile?.shortDescEn || "Founded in 1396 AH (1976 G) in Riyadh, AL-HADAB is a premier Class 1 General Contractor. Over five uninterrupted decades, the company has delivered essential civil infrastructure for ministries, Amanats, and PIF giga-projects with an owned fleet exceeding 280 heavy machines.")}
             </p>
           </div>
         </ScrollReveal>
@@ -193,7 +208,7 @@ export const AboutPage: React.FC = () => {
 
       {/* Verified Stats Banner */}
       <ScrollReveal direction="up" delay={0.1}>
-        <StatBanner isAr={isAr} />
+        <StatBanner isAr={isAr} statsData={dynamicStats} />
       </ScrollReveal>
 
       {/* Corporate Heritage & Core Values */}
@@ -220,8 +235,8 @@ export const AboutPage: React.FC = () => {
                 <h3 className="text-xl font-bold text-basalt-950">{isAr ? "رؤيتنا" : "Our Vision"}</h3>
                 <p className="text-sm text-basalt-600 leading-relaxed">
                   {isAr
-                    ? "أن تكون شركة الهضب النموذج الوطني الأعلى مكانة والأكثر موثوقية في قطاع المقاولات والهندسة المدنية بالمملكة العربية السعودية، وشريك التنمية الأول لكبرى المشاريع السيادية."
-                    : "To be the Kingdom's benchmark indigenous contracting and civil engineering partner, recognized for unmatched structural integrity, financial stability, and operational precision."}
+                    ? (profile?.visionAr || "أن تكون شركة الهضب النموذج الوطني الأعلى مكانة والأكثر موثوقية في قطاع المقاولات والهندسة المدنية بالمملكة العربية السعودية، وشريك التنمية الأول لكبرى المشاريع السيادية.")
+                    : (profile?.visionEn || "To be the Kingdom's benchmark indigenous contracting and civil engineering partner, recognized for unmatched structural integrity, financial stability, and operational precision.")}
                 </p>
               </div>
             </div>
@@ -236,8 +251,8 @@ export const AboutPage: React.FC = () => {
                 <h3 className="text-xl font-bold text-basalt-950">{isAr ? "رسالتنا" : "Our Mission"}</h3>
                 <p className="text-sm text-basalt-600 leading-relaxed">
                   {isAr
-                    ? "تنفيذ وتسليم مشاريع البنية التحتية والمدن بأعلى المواصفات الفنية المعتمدة عالمياً، مع الالتزام التام بكود البناء السعودي ومعايير السلامة المهنية، بقيادة كفاءات وطنية متخصصة."
-                    : "Delivering infrastructure and civic works to rigorous global engineering standards, adhering strictly to the Saudi Building Code with zero compromise on safety and precision."}
+                    ? (profile?.missionAr || "تنفيذ وتسليم مشاريع البنية التحتية والمدن بأعلى المواصفات الفنية المعتمدة عالمياً، مع الالتزام التام بكود البناء السعودي ومعايير السلامة المهنية، بقيادة كفاءات وطنية متخصصة.")
+                    : (profile?.missionEn || "Delivering infrastructure and civic works to rigorous global engineering standards, adhering strictly to the Saudi Building Code with zero compromise on safety and precision.")}
                 </p>
               </div>
             </div>
@@ -343,6 +358,99 @@ export const AboutPage: React.FC = () => {
               </div>
             </ScrollReveal>
           ))}
+        </div>
+      </section>
+
+      {/* Specialized Human Capital & Workforce Distribution */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <ScrollReveal direction="up">
+          <SectionHeader
+            badge={isAr ? "الكوادر البشرية" : "Specialized Workforce"}
+            titleAr="توزيع الكوادر الهندسية والفنية الميدانية"
+            titleEn="Multidisciplinary Technical & Engineering Labor Breakdown"
+            descriptionAr={`تعتمد شركة الهضب على أسطول بشري ذاتي التنفيذ يتجاوز ${(workforceSummary?.totalEmployees ?? 1250).toLocaleString()} كادراً متخصصاً يضمنون السيطرة الكاملة على الجودة ومعايير السلامة.`}
+            descriptionEn={`AL-HADAB deploys a self-performing, highly skilled workforce exceeding ${(workforceSummary?.totalEmployees ?? 1250).toLocaleString()} certified personnel with zero operational dependency on third-party basic trades.`}
+            isAr={isAr}
+          />
+        </ScrollReveal>
+
+        {/* Categories Grid */}
+        {workforceLoading ? (
+          <PageLoader variant="shimmer-list" count={6} />
+        ) : (workforceSummary?.categories ?? []).length === 0 ? (
+          <div className="py-10 text-center text-basalt-400 text-sm">
+            {isAr ? "لا توجد بيانات قوى عاملة متاحة حالياً" : "No workforce data available yet"}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {(workforceSummary?.categories ?? []).map((cat, idx) => {
+            const totalActive = workforceSummary?.totalEmployees || 1;
+            const sharePct = ((cat.employeeCount / totalActive) * 100).toFixed(1);
+
+            return (
+              <ScrollReveal key={cat.id || idx} direction="up" delay={0.05 * (idx + 1)}>
+                <div className="bg-white border border-sand-200 rounded-[10px] p-5 sm:p-6 space-y-3.5 text-start shadow-elevation-1 hover:border-copper-500/40 hover:shadow-elevation-2 transition-all h-full flex flex-col justify-between group">
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="h-10 w-10 rounded-[8px] bg-copper-50 text-copper-600 flex items-center justify-center font-bold group-hover:bg-copper-600 group-hover:text-white transition-colors">
+                        <HardHat className="h-5 w-5" />
+                      </div>
+                      <span className="font-mono text-xs font-bold px-2.5 py-1 rounded bg-sand-100 text-copper-700 border border-sand-200">
+                        {cat.employeeCount.toLocaleString()} {isAr ? "كادر" : "staff"}
+                      </span>
+                    </div>
+
+                    <h4 className="text-base font-bold text-basalt-950">
+                      {isAr ? cat.nameAr : cat.nameEn}
+                    </h4>
+
+                    {(cat.descriptionAr || cat.descriptionEn) && (
+                      <p className="text-xs text-basalt-600 leading-relaxed">
+                        {isAr ? cat.descriptionAr : cat.descriptionEn}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Share Percentage Progress Bar */}
+                  <div className="space-y-1.5 pt-3 border-t border-sand-100">
+                    <div className="flex justify-between text-[11px] font-semibold text-basalt-500">
+                      <span>{isAr ? "النسبة من إجمالي القوى العاملة" : "Workforce Share"}</span>
+                      <span className="font-mono text-copper-600 font-bold">{sharePct}%</span>
+                    </div>
+                    <div className="w-full bg-sand-200/80 rounded-full h-1.5 overflow-hidden">
+                      <div
+                        className="bg-copper-500 h-1.5 rounded-full transition-all duration-700"
+                        style={{ width: `${Math.min(100, Math.max(2, Number(sharePct)))}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            );
+          })}
+        </div>
+      )}
+
+        {/* National Localization Trust Badge */}
+        <div className="p-4 sm:p-5 rounded-[10px] bg-sand-100/70 border border-sand-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          <div className="flex items-center gap-3 text-start">
+            <div className="h-9 w-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-bold text-basalt-900">
+                {isAr ? "كفاءات معتمدة ومطابقة للاشتراطات التنظيمية (Nitaqat & QHSSE)" : "Certified Personnel & Full Regulatory Compliance (Nitaqat & QHSSE)"}
+              </p>
+              <p className="text-basalt-500 text-[11px]">
+                {isAr
+                  ? "برامج تدريب مستمرة على اشتراطات السلامة المهنية OSHA/NEBOSH وتوطين الكوادر الهندسية بنطاق بلاتيني."
+                  : "Continuous safety training in high-risk environments with Platinum-rated Saudization compliance."}
+              </p>
+            </div>
+          </div>
+          <Badge variant="success" className="whitespace-nowrap">
+            {isAr ? "نطاق بلاتيني معتمد" : "Platinum Nitaqat Rated"}
+          </Badge>
         </div>
       </section>
 

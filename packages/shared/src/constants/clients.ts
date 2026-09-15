@@ -5,8 +5,15 @@ export interface ClientEntity {
   nameEn: string;
   category: "MINISTRY" | "AMANAT" | "PIF_GIGA" | "SEMI_GOV" | "AUTHORITY" | "PRIVATE";
   monogram: string;
+  logoUrl?: string;
+  websiteUrl?: string;
   descriptionAr: string;
   descriptionEn: string;
+  displayOrder?: number;
+  isFeatured?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const VERIFIED_CLIENTS: ClientEntity[] = [

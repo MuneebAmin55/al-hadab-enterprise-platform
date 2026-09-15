@@ -4,8 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { VendorRegistrationSchema, VendorRegistrationInput } from "@alhadab/shared";
 import { useRegisterVendorMutation } from "../services/apiSlice";
 import { useAppSelector } from "../app/hooks";
-import { Button } from "../components/ui/Button";
-import { Badge } from "../components/ui/Badge";
+import { Button, Badge, SEOHead, ScrollReveal } from "../components/ui";
 import {
   Truck,
   ShieldCheck,
@@ -58,6 +57,14 @@ export const SuppliersPage: React.FC = () => {
 
   return (
     <div className="space-y-12 py-12">
+      <SEOHead
+        titleAr="بوابة الموردين والمقاولين — التسجيل والاعتماد المسبق"
+        titleEn="Vendor & Subcontractor Hub — Digital Onboarding & Pre-Qualification"
+        descriptionAr="سجل شركتك كمورد معتمد أو مقاول من الباطن لدى شركة الهضب للتجارة والمقاولات، للمشاركة في حزم التوريد والتنفيذ لمشاريع البنية التحتية بالمملكة."
+        descriptionEn="Digital vendor onboarding portal to pre-qualify as a certified supplier or subcontractor for AL-HADAB infrastructure packages across Saudi Arabia."
+        canonicalPath="/suppliers"
+      />
+
       {/* Header Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-sand-200 pb-8 space-y-3 text-start">

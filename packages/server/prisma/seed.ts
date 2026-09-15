@@ -1,6 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { CAPABILITY_VERTICALS, VERIFIED_CLIENTS } from "@alhadab/shared";
+import {
+  CAPABILITY_VERTICALS,
+  VERIFIED_CLIENTS,
+  DEFAULT_WORKFORCE_CATEGORIES,
+  ALHADAB_CORPORATE_PROFILE,
+  VERIFIED_NEWS_ARTICLES,
+  VERIFIED_JOB_OPENINGS
+} from "@alhadab/shared";
 
 const prisma = new PrismaClient();
 
@@ -11,7 +18,7 @@ async function main() {
   const adminPasswordHash = await bcrypt.hash("Alhadab@2026!Secure", 12);
   const adminUser = await prisma.user.upsert({
     where: { email: "admin@alhadab.com.sa" },
-    update: {},
+    update: { passwordHash: adminPasswordHash },
     create: {
       email: "admin@alhadab.com.sa",
       passwordHash: adminPasswordHash,
@@ -21,6 +28,45 @@ async function main() {
     }
   });
   console.log(`Seeded admin user: ${adminUser.email}`);
+
+  const editorUser = await prisma.user.upsert({
+    where: { email: "editor@alhadab.com.sa" },
+    update: { passwordHash: adminPasswordHash },
+    create: {
+      email: "editor@alhadab.com.sa",
+      passwordHash: adminPasswordHash,
+      fullName: "Nouf Al-Otaibi (Corporate Content Editor)",
+      role: "EDITOR",
+      isActive: true
+    }
+  });
+  console.log(`Seeded editor user: ${editorUser.email}`);
+
+  const estimatorUser = await prisma.user.upsert({
+    where: { email: "estimator@alhadab.com.sa" },
+    update: { passwordHash: adminPasswordHash },
+    create: {
+      email: "estimator@alhadab.com.sa",
+      passwordHash: adminPasswordHash,
+      fullName: "Eng. Fahad Al-Zahrani (Lead Tenders Estimator)",
+      role: "ESTIMATOR",
+      isActive: true
+    }
+  });
+  console.log(`Seeded estimator user: ${estimatorUser.email}`);
+
+  const auditorUser = await prisma.user.upsert({
+    where: { email: "auditor@alhadab.com.sa" },
+    update: { passwordHash: adminPasswordHash },
+    create: {
+      email: "auditor@alhadab.com.sa",
+      passwordHash: adminPasswordHash,
+      fullName: "Dr. Khaled Al-Mutairi (Compliance & QHSSE Auditor)",
+      role: "AUDITOR",
+      isActive: true
+    }
+  });
+  console.log(`Seeded auditor user: ${auditorUser.email}`);
 
   // 2. Seed Verified National Clients
   for (const client of VERIFIED_CLIENTS) {
@@ -184,66 +230,6 @@ async function main() {
       heroImageUrl: "https://images.unsplash.com/photo-1590496793929-36417d3117de?auto=format&fit=crop&w=1600&q=80",
       galleryUrls: JSON.stringify([]),
       isFlagship: true
-    },
-    {
-      slug: "tarshid-smart-led-lighting-western-province",
-      titleAr: "مشروع ترشيد كفاءة الطاقة لإنارة الشوارع بالمنطقة الغربية",
-      titleEn: "Tarshid Smart LED Street Lighting Efficiency Program (Western Region)",
-      clientId: "c-tarshid",
-      verticalId: "electrical-energy",
-      region: "WESTERN",
-      cityAr: "جدة والمنطقة الغربية",
-      cityEn: "Jeddah & Western Province",
-      lat: 21.5433,
-      lng: 39.1728,
-      executionStatus: "COMPLETED",
-      yearHijri: 1443,
-      yearGregorian: 2022,
-      summaryAr: "استبدال وتحديث أكثر من 65,000 كشاف إنارة تقليدي بكشافات LED ذكية موفرة للطاقة مع أنظمة تحكم مركزي.",
-      summaryEn: "Retrofit of 65,000+ conventional luminaires with intelligent LED systems and centralized tele-management controls.",
-      challengeAr: "تنفيذ الأعمال على طرق حيوية سريعة وشوارع تجارية دون إعاقة حركة المرور مع التزام بنسبة وفورات طاقة تفوق 68%.",
-      challengeEn: "Executing installations across high-speed arterials and commercial streets with a contractually mandated energy saving > 68%.",
-      solutionAr: "فرق عمل متنقلة مجهزة برافعات سلة معزولة وأنظمة مسح ضوئي وتوثيق عبر تطبيقات GIS في الوقت الفعلي.",
-      solutionEn: "Deployment of specialized boom-truck fleets with mobile GIS mapping and real-time inventory validation.",
-      metrics: JSON.stringify([
-        { labelAr: "كشافات LED المستبدلة", labelEn: "Smart LED Fixtures", value: "65,400", unitAr: "كشاف", unitEn: "units" },
-        { labelAr: "نسبة توفير الطاقة المحققة", labelEn: "Energy Consumption Saved", value: "71.2", unitAr: "%", unitEn: "%" },
-        { labelAr: "انخفاض انبعاثات الكربون", labelEn: "Annual Carbon Offset", value: "48,000", unitAr: "طن CO₂", unitEn: "tons CO₂" }
-      ]),
-      fleetUnits: JSON.stringify(["شاحنات سلة هيدروليكية", "أجهزة قياس لوكس الضوئي", "مختبرات فحص كهرومغناطيسي"]),
-      heroImageUrl: "https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=1600&q=80",
-      galleryUrls: JSON.stringify([]),
-      isFlagship: false
-    },
-    {
-      slug: "baha-mountainous-highway-and-retaining-walls",
-      titleAr: "مشروع تطوير عقبة حزنة والجدران الاستنادية الحجرية بالباحة",
-      titleEn: "Al-Baha Hazna Mountain Highway & Reinforced Stone Retention",
-      clientId: "c-baha",
-      verticalId: "roads-bridges",
-      region: "SOUTHERN",
-      cityAr: "الباحة",
-      cityEn: "Al Baha",
-      lat: 19.9888,
-      lng: 41.4644,
-      executionStatus: "COMPLETED",
-      yearHijri: 1442,
-      yearGregorian: 2021,
-      summaryAr: "إعادة تأهيل وسفلتة طريق عقبة جبلية بطول 24 كم مع إنشاء جدران استنادية خرسانية وحجرية لحماية المنحدرات من الانهيارات الصخرية.",
-      summaryEn: "Rehabilitation and asphalt surfacing of a 24 km mountain pass, featuring massive reinforced masonry walls for slope stability.",
-      challengeAr: "انحدارات عمودية حادة وضباب كثيف وتساقط مستمر للصخور أثناء مواسم الأمطار مع صعوبة مناورة المعدات الثقيلة.",
-      challengeEn: "Steep vertical drops, dense fog, seasonal rockfalls, and restricted heavy equipment turning radiuses.",
-      solutionAr: "تثبيت المنحدرات بشبكات أسلاك فولاذية عالية المقاومة، واستخدام خرسانة مسبقة التصلب ومداحل جبلية مدمجة.",
-      solutionEn: "Installation of high-tensile rockfall protection mesh, rapid-cure concrete formulations, and compact mountain rollers.",
-      metrics: JSON.stringify([
-        { labelAr: "طول المسار الجبلي", labelEn: "Highway Length", value: "24", unitAr: "كم", unitEn: "km" },
-        { labelAr: "الجدران الاستنادية", labelEn: "Reinforced Retention Walls", value: "32,000", unitAr: "م³", unitEn: "m³" },
-        { labelAr: "ساعات عمل آمنة", labelEn: "Safe Man-Hours", value: "1,600,000", unitAr: "ساعة", unitEn: "hrs" }
-      ]),
-      fleetUnits: JSON.stringify(["مداحل جبلية مدمجة", "حفارات قص صخري", "شاحنات خرسانة دفع رباعي"]),
-      heroImageUrl: "https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=1600&q=80",
-      galleryUrls: JSON.stringify([]),
-      isFlagship: false
     }
   ];
 
@@ -304,6 +290,152 @@ async function main() {
     });
   }
   console.log(`Seeded ${flagshipProjects.length} flagship projects.`);
+
+  // 5. Seed Company Profile (singleton)
+  await prisma.companyProfile.upsert({
+    where: { id: "singleton" },
+    update: {},
+    create: {
+      id: "singleton",
+      nameAr: ALHADAB_CORPORATE_PROFILE.nameAr,
+      nameEn: ALHADAB_CORPORATE_PROFILE.nameEn,
+      legalEntityAr: ALHADAB_CORPORATE_PROFILE.legalEntityAr,
+      legalEntityEn: ALHADAB_CORPORATE_PROFILE.legalEntityEn,
+      foundingYearHijri: ALHADAB_CORPORATE_PROFILE.foundingYearHijri,
+      foundingYearGregorian: ALHADAB_CORPORATE_PROFILE.foundingYearGregorian,
+      headquartersAr: ALHADAB_CORPORATE_PROFILE.headquartersAr,
+      headquartersEn: ALHADAB_CORPORATE_PROFILE.headquartersEn,
+      addressAr: ALHADAB_CORPORATE_PROFILE.addressAr,
+      addressEn: ALHADAB_CORPORATE_PROFILE.addressEn,
+      phonePrimary: ALHADAB_CORPORATE_PROFILE.phonePrimary,
+      phoneSecondary: ALHADAB_CORPORATE_PROFILE.phoneSecondary,
+      whatsapp: ALHADAB_CORPORATE_PROFILE.whatsapp,
+      emailOfficial: ALHADAB_CORPORATE_PROFILE.emailOfficial,
+      emailTenders: ALHADAB_CORPORATE_PROFILE.emailTenders,
+      contractorClassification: ALHADAB_CORPORATE_PROFILE.contractorClassification,
+      crNumber: ALHADAB_CORPORATE_PROFILE.crNumber,
+      vatNumber: ALHADAB_CORPORATE_PROFILE.vatNumber,
+      statsYearsOfExperience: ALHADAB_CORPORATE_PROFILE.stats?.yearsOfExperience ?? 35,
+      statsActiveWorkforce: ALHADAB_CORPORATE_PROFILE.stats?.activeWorkforce ?? 1850,
+      statsHeavyEquipmentUnits: ALHADAB_CORPORATE_PROFILE.stats?.heavyEquipmentUnits ?? 420,
+      statsSafeManHoursLogged: ALHADAB_CORPORATE_PROFILE.stats?.safeManHoursLogged ?? 12500000,
+      statsNationalPartnersCount: ALHADAB_CORPORATE_PROFILE.stats?.nationalPartnersCount ?? 48,
+      statsCompletedProjectsCount: ALHADAB_CORPORATE_PROFILE.stats?.completedProjectsCount ?? 160,
+      shortDescAr: ALHADAB_CORPORATE_PROFILE.shortDescAr,
+      shortDescEn: ALHADAB_CORPORATE_PROFILE.shortDescEn,
+      fullDescAr: ALHADAB_CORPORATE_PROFILE.fullDescAr,
+      fullDescEn: ALHADAB_CORPORATE_PROFILE.fullDescEn,
+      founderMessageAr: ALHADAB_CORPORATE_PROFILE.founderMessageAr,
+      founderMessageEn: ALHADAB_CORPORATE_PROFILE.founderMessageEn,
+      visionAr: ALHADAB_CORPORATE_PROFILE.visionAr,
+      visionEn: ALHADAB_CORPORATE_PROFILE.visionEn,
+      missionAr: ALHADAB_CORPORATE_PROFILE.missionAr,
+      missionEn: ALHADAB_CORPORATE_PROFILE.missionEn,
+      mainImageUrl: ALHADAB_CORPORATE_PROFILE.mainImageUrl,
+      seoTitleAr: ALHADAB_CORPORATE_PROFILE.seoTitleAr,
+      seoTitleEn: ALHADAB_CORPORATE_PROFILE.seoTitleEn,
+      seoDescAr: ALHADAB_CORPORATE_PROFILE.seoDescAr,
+      seoDescEn: ALHADAB_CORPORATE_PROFILE.seoDescEn,
+      isPublished: true
+    }
+  });
+  console.log("Seeded Company Profile singleton.");
+
+  // 6. Seed Workforce Categories
+  for (const cat of DEFAULT_WORKFORCE_CATEGORIES) {
+    await prisma.workforceCategory.upsert({
+      where: { id: cat.id },
+      update: {
+        nameEn: cat.nameEn,
+        nameAr: cat.nameAr,
+        employeeCount: cat.employeeCount,
+        descriptionEn: cat.descriptionEn,
+        descriptionAr: cat.descriptionAr,
+        displayOrder: cat.displayOrder,
+        isActive: cat.isActive
+      },
+      create: {
+        id: cat.id,
+        nameEn: cat.nameEn,
+        nameAr: cat.nameAr,
+        employeeCount: cat.employeeCount,
+        descriptionEn: cat.descriptionEn,
+        descriptionAr: cat.descriptionAr,
+        displayOrder: cat.displayOrder,
+        isActive: cat.isActive
+      }
+    });
+  }
+  console.log(`Seeded ${DEFAULT_WORKFORCE_CATEGORIES.length} workforce categories.`);
+
+  // 7. Seed News Articles
+  for (const article of VERIFIED_NEWS_ARTICLES) {
+    await prisma.newsArticle.upsert({
+      where: { slug: article.slug },
+      update: {
+        titleAr: article.titleAr,
+        titleEn: article.titleEn,
+        summaryAr: article.summaryAr,
+        summaryEn: article.summaryEn,
+        contentAr: article.contentAr,
+        contentEn: article.contentEn,
+        featuredImageUrl: article.featuredImageUrl,
+        author: article.author,
+        category: article.category,
+        isFeatured: article.isFeatured,
+        isPublished: article.isPublished
+      },
+      create: {
+        id: article.id,
+        slug: article.slug,
+        titleAr: article.titleAr,
+        titleEn: article.titleEn,
+        summaryAr: article.summaryAr,
+        summaryEn: article.summaryEn,
+        contentAr: article.contentAr,
+        contentEn: article.contentEn,
+        featuredImageUrl: article.featuredImageUrl,
+        author: article.author,
+        category: article.category,
+        isFeatured: article.isFeatured,
+        isPublished: article.isPublished
+      }
+    });
+  }
+  console.log(`Seeded ${VERIFIED_NEWS_ARTICLES.length} news articles.`);
+
+  // 8. Seed Job Openings
+  for (const job of VERIFIED_JOB_OPENINGS) {
+    await prisma.jobOpening.upsert({
+      where: { id: job.id },
+      update: {
+        titleAr: job.titleAr,
+        titleEn: job.titleEn,
+        department: job.department,
+        location: job.location,
+        employmentType: job.employmentType,
+        descriptionAr: job.descriptionAr,
+        descriptionEn: job.descriptionEn,
+        requirementsAr: job.requirementsAr,
+        requirementsEn: job.requirementsEn,
+        isPublished: job.isPublished
+      },
+      create: {
+        id: job.id,
+        titleAr: job.titleAr,
+        titleEn: job.titleEn,
+        department: job.department,
+        location: job.location,
+        employmentType: job.employmentType,
+        descriptionAr: job.descriptionAr,
+        descriptionEn: job.descriptionEn,
+        requirementsAr: job.requirementsAr,
+        requirementsEn: job.requirementsEn,
+        isPublished: job.isPublished
+      }
+    });
+  }
+  console.log(`Seeded ${VERIFIED_JOB_OPENINGS.length} job openings.`);
 
   console.log("AL-HADAB database seeding completed successfully.");
 }

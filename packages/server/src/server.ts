@@ -73,7 +73,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-// 7. API Resource Endpoints
+// 7. API Resource Endpoints (v1)
 app.use("/api/v1", apiRouter);
 
 // 8. Global Error Interceptor

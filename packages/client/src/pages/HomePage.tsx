@@ -6,9 +6,11 @@ import {
   useGetCompanyProfileQuery,
   useGetClientsQuery,
   useGetCapabilitiesQuery,
-  useGetProjectsQuery
+  useGetProjectsQuery,
+  useGetPublicWorkforceQuery
 } from "../services/apiSlice";
 import type { CapabilityVertical, ClientEntity, ProjectCaseStudy } from "@alhadab/shared";
+import { VERIFIED_CLIENTS } from "@alhadab/shared";
 import {
   Button,
   Badge,
@@ -18,7 +20,8 @@ import {
   StatBanner,
   ProjectCard,
   CapabilityCard,
-  ClientLogo
+  ClientLogo,
+  PageLoader
 } from "../components/ui";
 import {
   Building2,
@@ -38,9 +41,26 @@ export const HomePage: React.FC = () => {
   const Arrow = isAr ? ArrowLeft : ArrowRight;
 
   const { data: profile } = useGetCompanyProfileQuery();
-  const { data: clients } = useGetClientsQuery();
-  const { data: capabilities } = useGetCapabilitiesQuery();
-  const { data: projects } = useGetProjectsQuery();
+  const { data: clients, isLoading: clientsLoading } = useGetClientsQuery();
+  const { data: capabilities, isLoading: capabilitiesLoading } = useGetCapabilitiesQuery();
+  const { data: projects, isLoading: projectsLoading } = useGetProjectsQuery();
+  const { data: workforceSummary } = useGetPublicWorkforceQuery();
+
+  // Only fall back to VERIFIED_CLIENTS when the API has responded with zero results
+  // (not while loading — avoid flash of wrong content)
+  const displayClients =
+    clientsLoading
+      ? null
+      : clients && clients.length > 0
+        ? clients
+        : VERIFIED_CLIENTS;
+
+  const dynamicStats = profile?.stats
+    ? {
+        ...profile.stats,
+        activeWorkforce: workforceSummary?.totalEmployees ?? profile.stats.activeWorkforce
+      }
+    : undefined;
 
   const handleOpenPrequal = () => {
     dispatch(setPrequalModalOpen(true));
@@ -163,7 +183,7 @@ export const HomePage: React.FC = () => {
 
       {/* 2. Verified Corporate Statistics Banner */}
       <ScrollReveal direction="up" delay={0.15}>
-        <StatBanner isAr={isAr} />
+        <StatBanner isAr={isAr} statsData={dynamicStats} />
       </ScrollReveal>
 
       {/* 3. The Cohort Intent Router (Pathways for Every Stakeholder) */}
@@ -263,7 +283,11 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 4. Flagship Projects Showcase */}
-      {flagshipProjects.length > 0 && (
+      {projectsLoading ? (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <PageLoader variant="shimmer-grid" count={3} />
+        </section>
+      ) : flagshipProjects.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <ScrollReveal direction="up">
             <SectionHeader
@@ -314,12 +338,15 @@ export const HomePage: React.FC = () => {
             />
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {capabilities?.map((vert: CapabilityVertical, idx: number) => (
-              <ScrollReveal key={vert.id} direction="up" delay={0.05 * (idx + 1)}>
-                <CapabilityCard vertical={vert} isAr={isAr} />
-              </ScrollReveal>
-            ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {capabilitiesLoading
+              ? <PageLoader variant="shimmer-grid" count={8} />
+              : capabilities?.map((vert: CapabilityVertical, idx: number) => (
+                <ScrollReveal key={vert.id} direction="up" delay={0.05 * (idx + 1)}>
+                  <CapabilityCard vertical={vert} isAr={isAr} />
+                </ScrollReveal>
+              ))
+            }
           </div>
         </div>
       </section>
@@ -339,13 +366,17 @@ export const HomePage: React.FC = () => {
         </ScrollReveal>
 
         {/* Partner Logo Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-          {clients?.map((client: ClientEntity, idx: number) => (
-            <ScrollReveal key={client.id} direction="up" delay={0.02 * (idx + 1)}>
-              <ClientLogo client={client} isAr={isAr} />
-            </ScrollReveal>
-          ))}
-        </div>
+        {clientsLoading ? (
+          <PageLoader variant="shimmer-clients" />
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {displayClients?.map((client: ClientEntity, idx: number) => (
+              <ScrollReveal key={client.id} direction="up" delay={0.02 * (idx + 1)}>
+                <ClientLogo client={client} isAr={isAr} />
+              </ScrollReveal>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 7. High-Stakes Conversion Dock */}
