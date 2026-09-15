@@ -3,6 +3,48 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export type Language = "ar" | "en";
 export type Direction = "rtl" | "ltr";
 
+/**
+ * Derives text and layout direction strictly from the given language.
+ */
+export const getLanguageDirection = (lang: Language): Direction => {
+  return lang === "ar" ? "rtl" : "ltr";
+};
+
+/**
+ * Synchronizes document.documentElement attributes with the specified language and direction.
+ */
+export const applyDocumentDirection = (lang: Language): Direction => {
+  const dir = getLanguageDirection(lang);
+  if (typeof document !== "undefined" && document.documentElement) {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = dir;
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("dir", dir);
+  }
+  return dir;
+};
+
+/**
+ * Reads and validates persisted language preference from localStorage.
+ * Defaults to "en" if not set or invalid.
+ */
+export const getInitialLanguage = (): Language => {
+  if (typeof window === "undefined") return "en";
+  try {
+    const saved = localStorage.getItem("language") || localStorage.getItem("alhadab_lang");
+    if (saved === "ar" || saved === "en") {
+      return saved;
+    }
+  } catch (e) {
+    // localStorage might be unavailable or restricted
+  }
+  return "en";
+};
+
+// Initial startup synchronization
+const initialLang: Language = getInitialLanguage();
+const initialDir: Direction = applyDocumentDirection(initialLang);
+
 interface UiState {
   language: Language;
   direction: Direction;
@@ -12,11 +54,9 @@ interface UiState {
   activeRegionFilter: string | null;
 }
 
-const initialLang: Language = (localStorage.getItem("alhadab_lang") as Language) || "ar";
-
 const initialState: UiState = {
   language: initialLang,
-  direction: initialLang === "ar" ? "rtl" : "ltr",
+  direction: initialDir,
   mobileMenuOpen: false,
   prequalModalOpen: false,
   activeVerticalFilter: null,
@@ -29,18 +69,23 @@ export const uiSlice = createSlice({
   reducers: {
     toggleLanguage: (state) => {
       const nextLang: Language = state.language === "ar" ? "en" : "ar";
+      const nextDir = applyDocumentDirection(nextLang);
       state.language = nextLang;
-      state.direction = nextLang === "ar" ? "rtl" : "ltr";
-      localStorage.setItem("alhadab_lang", nextLang);
-      document.documentElement.setAttribute("lang", nextLang);
-      document.documentElement.setAttribute("dir", state.direction);
+      state.direction = nextDir;
+      try {
+        localStorage.setItem("language", nextLang);
+        localStorage.setItem("alhadab_lang", nextLang);
+      } catch (e) {}
     },
     setLanguage: (state, action: PayloadAction<Language>) => {
-      state.language = action.payload;
-      state.direction = action.payload === "ar" ? "rtl" : "ltr";
-      localStorage.setItem("alhadab_lang", action.payload);
-      document.documentElement.setAttribute("lang", action.payload);
-      document.documentElement.setAttribute("dir", state.direction);
+      const targetLang: Language = action.payload === "ar" ? "ar" : "en";
+      const targetDir = applyDocumentDirection(targetLang);
+      state.language = targetLang;
+      state.direction = targetDir;
+      try {
+        localStorage.setItem("language", targetLang);
+        localStorage.setItem("alhadab_lang", targetLang);
+      } catch (e) {}
     },
     setMobileMenuOpen: (state, action: PayloadAction<boolean>) => {
       state.mobileMenuOpen = action.payload;

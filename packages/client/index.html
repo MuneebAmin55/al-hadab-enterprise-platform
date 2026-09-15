@@ -1,7 +1,20 @@
 <!doctype html>
-<html lang="ar" dir="rtl" class="h-full scroll-smooth">
+<html lang="en" dir="ltr" class="h-full scroll-smooth">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem("language") || localStorage.getItem("alhadab_lang");
+          var lang = (saved === "ar" || saved === "en") ? saved : "en";
+          var dir = lang === "ar" ? "rtl" : "ltr";
+          document.documentElement.lang = lang;
+          document.documentElement.dir = dir;
+          document.documentElement.setAttribute("lang", lang);
+          document.documentElement.setAttribute("dir", dir);
+        } catch (e) {}
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>شركة الهضب للتجارة والمقاولات | خبرة وطنية منذ 1396هـ (1976م)</title>

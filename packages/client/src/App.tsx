@@ -5,6 +5,8 @@ import {
 } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
+import { useAppSelector } from "./app/hooks";
+import { applyDocumentDirection } from "./app/uiSlice";
 import { MainLayout } from "./layouts/MainLayout";
 
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -67,10 +69,22 @@ const router = createBrowserRouter([
   }
 ]);
 
+const DocumentDirectionSync: React.FC = () => {
+  const language = useAppSelector((state) => state.ui.language);
+
+  React.useEffect(() => {
+    applyDocumentDirection(language);
+  }, [language]);
+
+  return null;
+};
+
 export const App: React.FC = () => {
   return (
     <Provider store={store}>
+      <DocumentDirectionSync />
       <RouterProvider router={router} />
     </Provider>
   );
 };
+
