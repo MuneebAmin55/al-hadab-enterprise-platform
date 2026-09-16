@@ -15,12 +15,21 @@ async function main() {
   console.log("Starting AL-HADAB enterprise database seed...");
 
   // 1. Seed Administrative Accounts
-  const adminPasswordHash = await bcrypt.hash("Alhadab@2026!Secure", 12);
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    throw new Error(
+      "ADMIN_EMAIL and ADMIN_PASSWORD must be defined in environment variables before seeding."
+    );
+  }
+
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
   const adminUser = await prisma.user.upsert({
-    where: { email: "admin@alhadab.com.sa" },
+    where: { email: adminEmail },
     update: { passwordHash: adminPasswordHash },
     create: {
-      email: "admin@alhadab.com.sa",
+      email: adminEmail,
       passwordHash: adminPasswordHash,
       fullName: "Eng. Tariq Al-Hadab (Chief Executive Admin)",
       role: "SUPERADMIN",
